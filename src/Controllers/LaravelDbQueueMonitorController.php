@@ -6,6 +6,7 @@ use DB;
 use AmiPraha\LaravelDbQueueMonitor\Models\Job;
 use AmiPraha\LaravelDbQueueMonitor\Models\Monitor;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Redis;
 use \Exception;
 
 class LaravelDbQueueMonitorController extends Controller
@@ -18,8 +19,8 @@ class LaravelDbQueueMonitorController extends Controller
 			$queue_driver = config('queue.default');
 			$queue_connection = config('queue.connections.' . $queue_driver . '.connection');
 			$queue_name = config('queue.connections.' . $queue_driver . '.queue');
-			$waiting_jobs_count = \Redis::connection($queue_connection)->llen('queues:default');
-			$waiting_jobs = \Redis::connection($queue_connection)->lrange('queues:' . $queue_name, 0, ($waiting_jobs_count > 0) ? $waiting_jobs_count - 1 : 1);
+			$waiting_jobs_count = Redis::connection($queue_connection)->llen('queues:default');
+			$waiting_jobs = Redis::connection($queue_connection)->lrange('queues:' . $queue_name, 0, ($waiting_jobs_count > 0) ? $waiting_jobs_count - 1 : 1);
 			foreach($monitors as &$monitor) {
 				$cnt = 0;
 				foreach($waiting_jobs as $waiting_job) {
